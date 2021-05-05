@@ -1,28 +1,50 @@
 FROM ubuntu:20.04
 
-ARG USERNAME=vscode
+RUN apt-get update && apt-get install -y sudo
+
+ARG USERNAME=uki
+ARG GROUPNAME=uki
+ARG UID=1000
+ARG GID=1000
+ARG PASSWORD=uki
+RUN groupadd -g $GID $GROUPNAME && \
+    useradd -m -s /bin/bash -u $UID -g $GID -G sudo $USERNAME && \
+    echo $USERNAME:$PASSWORD | chpasswd && \
+    echo "$USERNAME   ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+ENV IMAGE_NAME=UkiOS
+
+ENV TZ=Asia/Tokyo
 
 # install development tools
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-    build-essential \
-    llvm-7-dev \
-    lld-7 \
-    clang-7 \
-    nasm \
-    acpica-tools \
-    uuid-dev \
-    qemu-system-x86 \
-    qemu-utils \
-    xauth \
-    unzip \
-    # added
-    qemu-system-gui \
-    dosfstools \
-    git \
-    python3-distutils \
- && apt-get clean -y \
- && rm -rf /var/lib/apt/lists
+RUN apt-get update && apt-get install -y tzdata \
+    software-properties-common
+# RUN add-apt-repository ppa:neovim-ppa/unstable
+# RUN apt-get update && apt-get install neovim/focal
+RUN apt-get update && apt-get install -y --no-install-recommends \
+            # software-properties-common \
+            # neovim \
+            okteta \
+            tmux \
+            build-essential \
+            llvm-7-dev \
+            lld-7 \
+            clang-7 \
+            nasm \
+            acpica-tools \
+            uuid-dev \
+            qemu-system-x86 \
+            qemu-utils \
+            xauth \
+            unzip \
+            qemu-system-gui \
+            curl \
+            git \
+            python3-distutils \
+            dosfstools \
+            fish \ 
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists
 
 # set alternatives
 RUN for item in \
